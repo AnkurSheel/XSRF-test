@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "cd31fd87-c040-482a-9a83-dffc8e4a0b91",
+		"name": "XSRF_test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Post Message",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1eae3e52-5aa7-4166-99f3-b2f48c8368eb",
+						"exec": [
+							"var url = pm.environment.get('baseurl');\r",
+							"pm.sendRequest(`${url}/login`, function (err, response) {\r",
+							"    if (err) {\r",
+							"        return console.error(err);\r",
+							"    } else {\r",
+							"        var body = response.text();\r",
+							"        const html = cheerio(body);\r",
+							"        var allInputs = html.find('input[name=\"__RequestVerificationToken\"]');\r",
+							"        var input = allInputs.first();\r",
+							"        var token = input.val();\r",
+							"        pm.environment.set('xsrf-token', token);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "Message",
+							"value": "Hello",
+							"type": "text"
+						},
+						{
+							"key": "__RequestVerificationToken",
+							"value": "{{xsrf-token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
